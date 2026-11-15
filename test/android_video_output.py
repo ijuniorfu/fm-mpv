@@ -32,9 +32,10 @@ def generate(root, output):
     source += function(playloop, "handle_eof")
     # The remaining init path owns real VO/decoder resources. Observe entry
     # through the production Surface prerequisite before substituting that tail.
-    entry = function(video, "reinit_video_chain_src")
-    source += entry.split("    bool use_dovi_direct =", 1)[0]
-    source += "    test_video_output_init(mpctx, track);\n}\n"
+    entry = function(video, "reinit_video_chain_internal")
+    source += entry[:entry.index("    bool use_dovi_direct =")]
+    source += "    test_video_output_init(mpctx, track);\n    return true;\n}\n"
+    source += function(video, "reinit_video_chain_src")
     loadfile = (root / "player/loadfile.c").read_text(encoding="utf-8")
     start = loadfile.index("    reinit_video_chain(mpctx);", loadfile.index("static void play_current_file"))
     end = loadfile.index("    // For lavfi-complex mode", start)
